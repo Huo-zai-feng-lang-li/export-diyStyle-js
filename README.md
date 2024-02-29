@@ -77,7 +77,7 @@ High performance & Simplicity Vue3 Hooks library
 - \* @createDate 2024/01/10 09:32:04
 - \* @lastFixDate 2024/01/10 09:32:04
 - \*\*/
-  > ![Alt text](9d1116396fafc4584eb9531c515b7cb.png)
+  > ![Alt text](readme.png)
 
 ### 📦 项目预览
 

@@ -1,0 +1,21 @@
+{
+  "name": "export-diystyle-js",
+  "version": "1.0.0",
+  "description": "🛠️ 纯前端JavaScript实现Excel导出：支持多样式、合并与样式控制 200行纯Js",
+  "main": "index.js",
+  "private": false,
+  "type": "module",
+  "scripts": {
+    "test": "vite --mode test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Huo-zai-feng-lang-li/export-diyStyle-js.git"
+  },
+  "author": "Zhangkun <1334132303@qq.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Huo-zai-feng-lang-li/export-diyStyle-js/issues"
+  },
+  "homepage": "https://github.com/Huo-zai-feng-lang-li/export-diyStyle-js#readme"
+}
