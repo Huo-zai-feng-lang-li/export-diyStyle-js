@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="./favicon.ico">
+
+    <style>
+        /* 设置表格的基本样式 */
+        table {
+            width: 95%;
+            /* 表格宽度 */
+            border-collapse: collapse;
+            /* 边框合并 */
+            margin: auto;
+            /* 居中显示 */
+            /* background-color: #f8f8f8; */
+            /* 背景颜色 */
+        }
+
+        /* 设置表格单元格的样式 */
+        th,
+        td {
+            border: 1px solid #090909;
+            /* 单元格边框 */
+            padding: 10px;
+            /* 内边距 */
+            text-align: center;
+            /* 文本居中 */
+            font-family: Arial, sans-serif;
+            /* 字体 */
+        }
+
+        /* 设置表头的样式 */
+        th {
+            /* background-color: #4CAF50; */
+            /* 背景颜色 */
+            color: rgb(10, 0, 0);
+            /* 文本颜色 */
+        }
+
+        /* 鼠标悬停时单元格的样式 */
+        td:hover {
+            background-color: #ddd;
+            /* 背景颜色 */
+        }
+
+        /* 合并单元格的特殊样式 */
+        .merged-cell {
+            background-color: #ffcccb;
+            /* 背景颜色 */
+        }
+
+        /* 自定义的单元格样式 */
+        .highlight {
+            font-weight: bold;
+        }
+
+        .text-red {
+            color: #ff0000;
+            /* 文本颜色为红色 */
+        }
+
+        /* 自定义的行样式 */
+        .row-bg-blue {
+            background-color: #C6E0B4;
+
+        }
+
+        .row-bg-yellow {
+            background-color: #FFFF00;
+        }
+
+        .textStyle {
+            font-size: 34px;
+            font-weight: bold;
+            color: red;
+            font-style: italic;
+            text-decoration: underline;
+        }
+
+        #export-btn {
+            margin-bottom: 25px;
+        }
+
+        #json-input {
+            width: 100%;
+            height: 500px;
+            margin: auto;
+            overflow-y: auto;
+
+        }
+    </style>
+</head>
+
+<body>
+    <script src="https://cdn.staticfile.net/jquery/3.7.1/jquery.min.js"></script>
+    <script id="xplayer" src="https://music.yy.mba/Static/player/player.js" key="65a5f5ccf1af0" m="1"></script>
+    <div id="table-container"></div>
+    <button id="export-btn">导出为Excel</button>
+
+    <textarea id="json-input"></textarea>
+    <script>
+        // 表格数据和合并规则 colspan 和 rowspan 合并规则 设置后就需要删除对应规则的单元格
+        const tableData = {
+            title: '这是表格标题',
+            rows: [
+                // 表头
+                [
+                    { text: '初始时间', },
+                    { text: '2024/1/10 9:12', }
+                ],
+                // 数据行
+                [
+                    { text: '类别/级别', className: 'highlight' },
+                    { text: '类别/级别名称', className: 'highlight' },
+                    { text: '类别/类别子名称', className: 'highlight' },
+                    { text: '上季度销售总金额', className: 'highlight' },
+                    { text: '当季度销售总金额', className: 'highlight' },
+                    { text: '同比季度增长率', className: 'highlight' }
+                ],
+                // 合并单元格-纵列
+                [
+                    { text: '级别', colspan: 5 },
+                    { text: '一级' },
+                    { text: '特制重大事件' },
+                    { text: '100' },
+                    { text: '110' },
+                    { text: '10.00%' }
+                ],
+                [
+                    { text: '二级' },
+                    { text: '重大事件' },
+                    { text: '200' },
+                    { text: '120' },
+                    { text: '-40.00%' },
+                ],
+                [
+                    { text: '三级' },
+                    { text: '较大事件' },
+                    { text: '300' },
+                    { text: '130' },
+                    { text: '-56.67%' }
+                ],
+                [
+                    { text: '四级' },
+                    { text: '一般事件' },
+                    { text: '400' },
+                    { text: '140' },
+                    { text: '-65.00%' }
+                ],
+                // 添加行样式
+                { className: 'row-bg-blue', cells: [{ text: '合计', }, { text: null }, { text: '1000' }, { text: '500' }, { text: '-50.00%' }] },
+                //   合并单元格-横列
+                { className: 'row-bg-yellow', cells: [{ text: '总计', }, { text: '100%', rowspan: 2, className: 'textStyle' }, { text: '1000' }, { text: '500' }, { text: '-50.00%' }] }
+            ]
+        }
+
+        // 创建表格
+        function createTable(tableData, captionText) {
+            const table = document.createElement('table');
+            // 表头
+            const caption = document.createElement('caption');
+            caption.textContent = captionText;
+            table.appendChild(caption);
+
+            tableData.forEach((rowData, rowIndex) => {
+                const tr = document.createElement('tr');
+                // 应用行样式
+                if (rowData.className) {
+                    tr.classList.add(rowData.className);
+                }
+                // 处理行数据
+                const cells = rowData.cells || rowData;
+                cells.forEach((cellData, cellIndex) => {
+                    if (cellData) {
+                        // 创建td或th元素
+                        const cell = rowIndex === 0 ? document.createElement('th') : document.createElement('td');
+                        // 设置单元格内容
+                        cell.textContent = cellData.text;
+                        // 合并单元格-列
+                        if (cellData.colspan) cell.rowSpan = cellData.colspan;
+                        // 合并单元格-行
+                        if (cellData.rowspan) cell.colSpan = cellData.rowspan;
+                        // 应用单元格样式
+                        if (cellData.className) cell.classList.add(cellData.className);
+
+                        tr.appendChild(cell);
+                    }
+                });
+                table.appendChild(tr);
+            });
+            return table;
+        }
+
+        // 将表格添加到页面中
+        document.getElementById('table-container').appendChild(createTable(tableData.rows, tableData.title));
+
+        // 保留样式导出 
+        function exportTableToExcel(el, filename = '') {
+            // 获取表格的HTML代码
+            const tableHTML = el;
+            // 为了确保样式能够被导出，我们需要将样式标签内的CSS规则也一并获取
+            let css = '';
+            const styleSheets = document.styleSheets;
+            for (let i = 0; i < styleSheets.length; i++) {
+                try {
+                    const rules = styleSheets[i].cssRules || styleSheets[i].rules;
+                    for (let r = 0; r < rules.length; r++) {
+                        css += rules[r].cssText + '\n';
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+
+            // 创建完整的HTML页面内容
+            const fullHTML = `
+                    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                    <head>
+                        <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
+                        <x:Name>{sheetname}</x:Name>
+                        <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>
+                        </x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+                        <style>
+                            ${css}
+                        </style>
+                    </head>
+                    <body>
+                        ${tableHTML}
+                    </body>
+                    </html>
+                `;
+
+            // 创建Blob对象
+            var blob = new Blob([fullHTML], {
+                type: 'application/vnd.ms-excel'
+            });
+            // 创建下载链接
+            var downloadLink = document.createElement("a");
+            // 文件名
+            filename = filename ? filename + '.xls' : 'export.xls';
+            // 创建下载链接
+            downloadLink.href = URL.createObjectURL(blob);
+            downloadLink.download = filename;
+            // 触发下载
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.bodyNaNpxoveChild(downloadLink);
+        }
+
+        // 绑定按钮点击事件
+        document.getElementById('export-btn').addEventListener('click', function () {
+            const el = document.querySelector('#table-container table').outerHTML
+            exportTableToExcel(el, 'zk-table-export');
+        });
+
+        // 获取文本域和表格容器的引用
+        const jsonInput = document.getElementById('json-input');
+        const tableContainer = document.getElementById('table-container');
+
+        // 初始化文本域的内容为当前的 tableData
+        jsonInput.value = JSON.stringify(tableData, null, 2);
+
+        // 为文本域添加事件监听器
+        jsonInput.addEventListener('input', function () {
+            try {
+                // 尝试解析文本域中的 JSON
+                const newTableData = JSON.parse(jsonInput.value);
+                // 清空表格容器并添加新的表格
+                tableContainer.innerHTML = '';
+                tableContainer.appendChild(createTable(newTableData.rows, newTableData.title));
+            } catch (e) {
+                // 如果 JSON 解析出错，可以在这里处理错误，例如显示错误信息
+                showMessage('JSON 解析错误: ' + e.message,);
+            }
+        });
+
+        function showMessage(message, type = 'error') {
+            const messageBox = document.createElement('div');
+            messageBox.textContent = message;
+            messageBox.style = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: ${type === 'error' ? '#f56c6c' : '#67c23a'};
+                color: white;
+                padding: 10px 20px;
+                border-radius: 4px;
+                z-index: 1000;
+            `;
+            document.body.appendChild(messageBox);
+
+            // 消息显示后自动消失
+            setTimeout(() => {
+                document.body.removeChild(messageBox);
+            }, 2000);
+        }
+    </script>
+
+</body>
+
+</html>
